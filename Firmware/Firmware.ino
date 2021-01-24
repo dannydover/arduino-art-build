@@ -8,7 +8,7 @@
 
 
 // Pin Definitions
-#define LDR_PIN_SIG	A3
+#define LDR_PIN_SIG	A4
 #define LEDG_PIN_VIN	5
 #define PUSHBUTTONMOMENTARY_PIN_2	3
 #define SOLENOIDVALVE_PIN_COIL1	2
@@ -40,38 +40,42 @@ void setup()
     Serial.println("Start: ");
 
     pushButtonMomentary.init();
+    ldrAverageLight = ldr.readAverage(20);
     
-
-    /*
-    ldrAverageLight = ldr.readAverage();
-    
-    menuOption = menu();
-    */
-    
-    
+    //menuOption = menu();
+     
 }
 
-// Main logic of your circuit. It defines the interaction between the components you selected. After setup, it runs over and over again, in an eternal loop.
 void loop() 
 {
     bool pushButtonMomentaryVal = pushButtonMomentary.read();
-    
-    Serial.print(F("Val: ")); 
-    Serial.println(pushButtonMomentaryVal);
-    
-    if(pushButtonMomentaryVal == 1) {
-      Serial.print(F("Button is pressed"));
-      solenoidValve.on();
+    int ldrSample = ldr.read();
+    int ldrDiff = abs(ldrAverageLight - ldrSample);
 
-      
+    if(pushButtonMomentaryVal == 1) {
+      Serial.println(F("Button is pressed"));
+      solenoidValve.on();
     } else {
       solenoidValve.off();
     }
 
+    if(ldrSample < 1023) {
+      Serial.println(F("Light is low"));
+      ledG.off();
+    } else {
+      Serial.println(F("Light is high"));
+            for(int i=255 ; i> 0 ; i -= 5)
+      {
+        ledG.dim(i);
+        delay(10);
+      } 
+      
+    }
+
     delay(500);
 
-    /*
-    
+
+    /* Debug menu logic
     if(menuOption == '1') {
     // LDR (Mini Photocell) - Test Code
     // Get current light reading, substract the ambient value to detect light changes
@@ -96,7 +100,6 @@ void loop()
     //if button is pressed function will return HIGH (1). if not function will return LOW (0). 
     //for debounce funtionality try also pushButtonMomentary.onPress(), .onRelease() and .onChange().
     //if debounce is not working properly try changing 'debounceDelay' variable in Button.h
-    // bool pushButtonMomentaryVal = pushButtonMomentary.read();
     Serial.print(F("Val: ")); Serial.println(pushButtonMomentaryVal);
     }
     else if(menuOption == '4') {
@@ -113,15 +116,14 @@ void loop()
     {
         menuOption = menu();
     }
-
     */
-    
 }
 
 
 
 // Menu function for selecting the components to be tested
 // Follow serial monitor for instrcutions
+/*
 char menu()
 {
 
@@ -158,6 +160,7 @@ char menu()
         }
     }
 }
+*/
 
 /*******************************************************
 
