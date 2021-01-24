@@ -37,18 +37,40 @@ void setup()
     // Use the Serial Monitor to view printed messages
     Serial.begin(9600);
     while (!Serial) ; // wait for serial port to connect. Needed for native USB
-    Serial.println("start");
-    
-    ldrAverageLight = ldr.readAverage();
+    Serial.println("Start: ");
+
     pushButtonMomentary.init();
+    
+
+    /*
+    ldrAverageLight = ldr.readAverage();
+    
     menuOption = menu();
+    */
+    
     
 }
 
 // Main logic of your circuit. It defines the interaction between the components you selected. After setup, it runs over and over again, in an eternal loop.
 void loop() 
 {
+    bool pushButtonMomentaryVal = pushButtonMomentary.read();
     
+    Serial.print(F("Val: ")); 
+    Serial.println(pushButtonMomentaryVal);
+    
+    if(pushButtonMomentaryVal == 1) {
+      Serial.print(F("Button is pressed"));
+      solenoidValve.on();
+
+      
+    } else {
+      solenoidValve.off();
+    }
+
+    delay(500);
+
+    /*
     
     if(menuOption == '1') {
     // LDR (Mini Photocell) - Test Code
@@ -74,7 +96,7 @@ void loop()
     //if button is pressed function will return HIGH (1). if not function will return LOW (0). 
     //for debounce funtionality try also pushButtonMomentary.onPress(), .onRelease() and .onChange().
     //if debounce is not working properly try changing 'debounceDelay' variable in Button.h
-    bool pushButtonMomentaryVal = pushButtonMomentary.read();
+    // bool pushButtonMomentaryVal = pushButtonMomentary.read();
     Serial.print(F("Val: ")); Serial.println(pushButtonMomentaryVal);
     }
     else if(menuOption == '4') {
@@ -91,6 +113,8 @@ void loop()
     {
         menuOption = menu();
     }
+
+    */
     
 }
 
