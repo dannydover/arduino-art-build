@@ -47,6 +47,8 @@ void setup()
 
     pushButtonMomentary.init();
     ldrAverageLight = ldr.readAverage();
+
+    bool motorExtended = false;
     
     //menuOption = menu();
      
@@ -57,10 +59,21 @@ void loop()
     bool pushButtonMomentaryVal = pushButtonMomentary.read();
     int ldrSample = ldr.read();
     int ldrDiff = abs(ldrAverageLight - ldrSample);
+    bool motorExtended;
     
     if(pushButtonMomentaryVal == 1) {
-      Serial.println(F("Button is pressed"));
-      dcMotorDriverL298.setMotorA(200,1);
+      Serial.println(F("Button was pressed"));
+ 
+      if(motorExtended == true) {
+        dcMotorDriverL298.setMotorA(230,1);
+        delay(2500);
+      } else {
+        dcMotorDriverL298.setMotorA(230,0);
+        delay(2500);
+      }
+
+      motorExtended = !motorExtended;
+      
     } else {
       dcMotorDriverL298.stopMotorA();
     }
@@ -78,6 +91,8 @@ void loop()
       ledG.off();
     }
 
+    Serial.print(F("Motor status: "));
+    Serial.println(motorExtended);
     delay(500);
 
 
