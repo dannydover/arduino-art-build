@@ -4,7 +4,6 @@
 #include "LDR.h"
 #include "LED.h"
 #include "Button.h"
-#include "SolenoidValve.h"
 #include "DCMDriverL298.h"
 
 
@@ -61,7 +60,7 @@ void loop()
     
     if(pushButtonMomentaryVal == 1) {
       Serial.println(F("Button is pressed"));
-      dcMotorDriverL298.setMotorA(200,0);
+      dcMotorDriverL298.setMotorA(200,1);
     } else {
       dcMotorDriverL298.stopMotorA();
     }
