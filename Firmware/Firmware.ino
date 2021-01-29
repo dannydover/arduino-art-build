@@ -5,13 +5,19 @@
 #include "LED.h"
 #include "Button.h"
 #include "SolenoidValve.h"
+#include "DCMDriverL298.h"
 
 
 // Pin Definitions
-#define LDR_PIN_SIG	A4
-#define LEDG_PIN_VIN	5
-#define PUSHBUTTONMOMENTARY_PIN_2	3
-#define SOLENOIDVALVE_PIN_COIL1	2
+#define LDR_PIN_SIG	A3
+#define LEDG_PIN_VIN	9
+#define PUSHBUTTONMOMENTARY_PIN_2	8
+#define DCMOTORDRIVERL298_PIN_INT1  2
+#define DCMOTORDRIVERL298_PIN_ENB 6
+#define DCMOTORDRIVERL298_PIN_INT2  3
+#define DCMOTORDRIVERL298_PIN_ENA 5
+#define DCMOTORDRIVERL298_PIN_INT3  4
+#define DCMOTORDRIVERL298_PIN_INT4  7
 
 
 
@@ -22,7 +28,8 @@ int ldrAverageLight;
 LDR ldr(LDR_PIN_SIG);
 LED ledG(LEDG_PIN_VIN);
 Button pushButtonMomentary(PUSHBUTTONMOMENTARY_PIN_2);
-SolenoidValve solenoidValve(SOLENOIDVALVE_PIN_COIL1);
+DCMDriverL298 dcMotorDriverL298(DCMOTORDRIVERL298_PIN_ENA,DCMOTORDRIVERL298_PIN_INT1,DCMOTORDRIVERL298_PIN_INT2,DCMOTORDRIVERL298_PIN_ENB,DCMOTORDRIVERL298_PIN_INT3,DCMOTORDRIVERL298_PIN_INT4);
+
 
 
 // define vars for testing menu
@@ -40,7 +47,7 @@ void setup()
     Serial.println("Start: ");
 
     pushButtonMomentary.init();
-    ldrAverageLight = ldr.readAverage(20);
+    ldrAverageLight = ldr.readAverage();
     
     //menuOption = menu();
      
@@ -51,25 +58,25 @@ void loop()
     bool pushButtonMomentaryVal = pushButtonMomentary.read();
     int ldrSample = ldr.read();
     int ldrDiff = abs(ldrAverageLight - ldrSample);
-
+    
     if(pushButtonMomentaryVal == 1) {
       Serial.println(F("Button is pressed"));
-      solenoidValve.on();
+      dcMotorDriverL298.setMotorA(200,0);
     } else {
-      solenoidValve.off();
+      dcMotorDriverL298.stopMotorA();
     }
 
-    if(ldrSample < 1023) {
-      Serial.println(F("Light is low"));
-      ledG.off();
-    } else {
+    if(ldrDiff < 50) {
       Serial.println(F("Light is high"));
-            for(int i=255 ; i> 0 ; i -= 5)
+      
+      for(int i=255 ; i> 0 ; i -= 5)
       {
         ledG.dim(i);
         delay(10);
       } 
-      
+    } else {
+      Serial.println(F("Light is low"));
+      ledG.off();
     }
 
     delay(500);
